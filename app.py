@@ -37,7 +37,7 @@ def run(user_input, history, user_name):
         'preset': 'None',
         'do_sample': True,
         'temperature': 0.9,
-        'top_p': 0.1,
+        'top_p': 0.4,
         'typical_p': 1,
         'epsilon_cutoff': 0,  # In units of 1e-4
         'eta_cutoff': 0,  # In units of 1e-4
@@ -65,7 +65,7 @@ def run(user_input, history, user_name):
         'ban_eos_token': False,
         'custom_token_bans': '',
         'skip_special_tokens': True,
-        'stopping_strings': []
+        'stopping_strings': ['\n', user_name + ':']
     }
 
     uri = os.getenv("OOBA_URI")
@@ -88,7 +88,7 @@ if __name__ == '__main__':
             return
 
         if 'вик' not in message.text.lower():
-            if random.randint(0, 100) < 75:
+            if random.randint(0, 100) < 90:
                 return
 
         user = (await Victoria.api.users.get(message.from_id))[0]
