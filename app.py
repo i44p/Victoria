@@ -23,10 +23,12 @@ def run(user_input, history, user_name):
         # 'name2': 'name of character', # Optional
         # 'context': 'character context', # Optional
         # 'greeting': 'greeting', # Optional
-        'name1_instruct': user_name + ': ', # Optional
-        'name2_instruct': 'Вика: ', # Optional
-        'context_instruct': f'<s>Это чат между {user_name} и Викой (Виктория Забиякова), девушкой, являющейся студенткой университета НГТУ. Вика не может просматривать вложения и изображения. Предпочитаемый язык - Русский.', # Optional
-        'turn_template': '[INST] <|user|><|user-message|> [/INST]<|bot|><|bot-message|></s>', # Optional
+        'name1_instruct': user_name + ': ',  # Optional
+        'name2_instruct': 'Вика: ',  # Optional
+        # Optional
+        'context_instruct': f'<s>Это чат между {user_name} и Викой (Виктория Забиякова), девушкой, являющейся студенткой университета НГТУ. Вика не может просматривать вложения и изображения. Предпочитаемый язык - Русский.',
+        # Optional
+        'turn_template': '[INST] <|user|><|user-message|> [/INST]<|bot|><|bot-message|></s>',
         'regenerate': False,
         '_continue': False,
 
@@ -65,31 +67,18 @@ def run(user_input, history, user_name):
         'skip_special_tokens': True,
         'stopping_strings': []
     }
-    
+
     uri = os.getenv("OOBA_URI")
-    print(uri)
     response = requests.post(uri, json=request)
 
     if response.status_code == 200:
         history = response.json()["results"][0]["history"]
     return history
 
+
 if __name__ == '__main__':
     dotenv.load_dotenv()
     ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
-    
-    user_input = "Please give me a step-by-step guide on how to plant a tree in my backyard."
-
-    # Basic example
-    history = {'internal': [], 'visible': []}
-
-    # "Continue" example. Make sure to set '_continue' to True above
-    # arr = [user_input, 'Surely, here is']
-    # history = {'internal': [arr], 'visible': [arr]}
-
-    #print(html.unescape(run("@Victoria ты кто?", history, "Иван")['visible'][-1][1]))
-    
-    
 
     Victoria = Bot(token=ACCESS_TOKEN)
 
@@ -97,7 +86,7 @@ if __name__ == '__main__':
     async def message_handler(message: Message):
         if not message.text:
             return
-        
+
         if 'вик' not in message.text.lower():
             if random.randint(0, 100) < 75:
                 return
@@ -107,11 +96,10 @@ if __name__ == '__main__':
             nickname = user.nickname
         else:
             nickname = user.first_name
-        
-        print(await Victoria.api.users.get(message.from_id))
+
         history = {'internal': [], 'visible': []}
-        generated_text = html.unescape(run(message.text, history, nickname)['visible'][-1][1])
+        generated_text = html.unescape(
+            run(message.text, history, nickname)['visible'][-1][1])
         await message.answer(generated_text)
-        
 
     Victoria.run_forever()
